@@ -9,6 +9,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.initUI()
+        self.apply_stylesheet()
 
     def send_terminal_input(self):
         input_text = self.terminal_input.text()[1:]  # Exclude the first character ">"
@@ -101,6 +102,56 @@ class MainWindow(QMainWindow):
 
 
         central_widget.setLayout(vbox)
+
+    def apply_stylesheet(self):
+        qss = '''
+            QWidget {
+                background-color: #444654;
+                color: #ffffff; 
+            }
+            
+            QPushButton {
+                background-color: #343541;
+                border: 1px solid #343541;
+                border-radius: 3px;
+                padding: 5px;
+                color: #ffffff;
+            }
+            
+            QPushButton:hover {
+                background-color: #444654;
+                border: 1px solid #343541;
+                border-radius: 3px;
+                padding: 5px;
+                color: #ffffff;
+            }
+            
+            QPushButton:pressed {
+                background-color: #444654;
+                border: 1px solid #343541;
+                border-radius: 3px;
+                padding: 5px;
+                color: #ffffff;
+            }
+            
+            QTextEdit, QPlainTextEdit {
+                background-color: #000000;
+                color: #ffffff;
+                border: 3px solid #343541;
+                border-radius: 3px;
+            }
+
+            TerminalInput {
+                background-color: #000000;
+                color: #ffffff;
+                border: 1px solid #444654;
+                border-radius: 3px;
+            }
+
+        '''
+
+
+        self.setStyleSheet(qss)
 
     def load_jsonld(self):
         global filepath
