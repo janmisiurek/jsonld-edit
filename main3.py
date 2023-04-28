@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout, QLabel, QWidget, QSizePolicy, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QTextEdit, QPushButton, QHBoxLayout, QLabel, QWidget, QPlainTextEdit, QMessageBox, QLineEdit
 from graph_editor import load_jsonld, save_jsonld, edit_jsonld, extract_information
 import json
 from graph_visualizer import draw_graph
@@ -10,8 +10,29 @@ class MainWindow(QMainWindow):
 
         self.initUI()
 
+    def send_terminal_input(self):
+        input_text = self.terminal_input.text()[1:]  # Exclude the first character ">"
+        self.terminal_widget.appendPlainText("> " + input_text)
+        self.terminal_input.clear()
+        self.terminal_input.setText(">")
+
     def initUI(self):
-        self.setWindowTitle('Knowledge Graph App')
+
+        class TerminalInput(QLineEdit):
+            def __init__(self, parent=None):
+                super(TerminalInput, self).__init__(parent)
+                self.setText(">")
+
+            def keyPressEvent(self, event):
+                if self.cursorPosition() == 0 and event.text() == "\b":
+                    return
+                super(TerminalInput, self).keyPressEvent(event)
+                
+            def focusInEvent(self, event):
+                if self.cursorPosition() == 0:
+                    self.setCursorPosition(1)
+                super(TerminalInput, self).focusInEvent(event)
+                self.setWindowTitle('Knowledge Graph App')
 
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
@@ -67,6 +88,17 @@ class MainWindow(QMainWindow):
         self.extract_button = QPushButton('Extract Information', self)
         self.extract_button.clicked.connect(self.extract_information)
         vbox.addWidget(self.extract_button)
+
+        # Terminal Output
+        self.terminal_widget = QPlainTextEdit(self)
+        self.terminal_widget.setReadOnly(True)
+        vbox.addWidget(self.terminal_widget)
+
+        # Terminal Input
+        self.terminal_input = TerminalInput(self)
+        self.terminal_input.returnPressed.connect(self.send_terminal_input)
+        vbox.addWidget(self.terminal_input)
+
 
         central_widget.setLayout(vbox)
 

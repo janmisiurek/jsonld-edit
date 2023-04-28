@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QTextEdit, QPushButton, QLabel, QWidget, QSizePolicy, QMessageBox, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout, QTextEdit, QPushButton, QLabel, QWidget, QPlainTextEdit, QMessageBox, QHBoxLayout
 from graph_editor import load_jsonld, save_jsonld, edit_jsonld, extract_information
 import json
 from graph_visualizer import draw_graph
@@ -64,6 +64,10 @@ class MainWindow(QMainWindow):
         self.extract_button = QPushButton('Extract Information', self)
         self.extract_button.clicked.connect(self.extract_information)
         vbox.addWidget(self.extract_button)
+
+        self.terminal_widget = QPlainTextEdit(self)
+        self.terminal_widget.setReadOnly(True)
+        vbox.addWidget(self.terminal_widget)
 
         central_widget.setLayout(vbox)
 
