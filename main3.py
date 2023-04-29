@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QVBoxLayout,
 from graph_editor import load_jsonld, save_jsonld, edit_jsonld, extract_information
 import json
 from graph_visualizer import draw_graph
+import io
+import builtins
+from commands import open_file
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -11,12 +14,39 @@ class MainWindow(QMainWindow):
         self.initUI()
         self.apply_stylesheet()
 
+
     def send_terminal_input(self):
         input_text = self.terminal_input.text()[1:]  # Exclude the first character ">"
         self.terminal_widget.appendPlainText("> " + input_text)
         self.terminal_input.clear()
         self.terminal_input.setText(">")
 
+        # Execute input command and redirect stdout
+        old_stdout = sys.stdout
+        redirected_stdout = io.StringIO()
+        sys.stdout = redirected_stdout
+
+        command = input_text.strip()
+
+        try:
+            if command in dir(sys.modules[__name__]):
+                func = getattr(sys.modules[__name__], command)
+                if callable(func):
+                    func()
+                else:
+                    print(f"{command} is not callable")
+            else:
+                exec(input_text, globals())
+        except Exception as e:
+            print(f"Error: {e}")
+
+        output = redirected_stdout.getvalue()
+        sys.stdout = old_stdout
+
+        # Append output to the terminal
+        self.terminal_widget.appendPlainText(output.strip())
+
+    # UI
     def initUI(self):
 
         class TerminalInput(QLineEdit):
@@ -103,6 +133,7 @@ class MainWindow(QMainWindow):
 
         central_widget.setLayout(vbox)
 
+    # theme
     def apply_stylesheet(self):
         qss = '''
             QWidget {
@@ -210,9 +241,3 @@ if __name__ == '__main__':
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec_())
-
-
-
-
-
-
